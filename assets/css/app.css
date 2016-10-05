@@ -13,6 +13,11 @@ html, body {
   height: 100%;
   background-color: #5E6D70;
 }
+h1, h2, h3, h4, h5 {
+  text-align: center;
+  font-weight: bold;
+  color: #FFFFFF;
+}
 .row {
   margin: 0px;
 }
@@ -55,7 +60,9 @@ html, body {
     }
 
     .side-nav li a:hover,
-    .side-nav li a:focus {
+    .side-nav li a:focus,
+    .side-nav li div:hover,
+    .side-nav li div:focus {
         outline: none;
         background-color: #000 !important;
     }
@@ -63,18 +70,30 @@ html, body {
 .side-nav > li > ul {
     padding: 0;
 }
-.side-nav > li > ul > li > a {
+.side-nav > li > ul > li > div {
     display: block;
-    padding: 10px 15px 10px 38px;
+    padding: 10px 30px;
     text-decoration: none;
     color: #424E4F;
 }
-.side-nav > li > ul > li > a:hover {
+.side-nav > li > ul > li > div:hover {
     color: #FFFFFF;
+}
+.side-nav a {
+  color: #424E4F;
+  padding-left: 10px;
+}
+.side-nav a:hover {
+  text-decoration: none;
+}
+.side-nav input[type="checkbox"]{
+  position: relative;
+  top: 1px;
 }
 
 #content{
   padding-top: 70px;
+  max-width: 1200px;
 }
 @media(min-width:768px) {
   #content{
@@ -177,4 +196,38 @@ html, body {
 	color: #fff;
 	background-color: #1CA347;
 	border-color: #1CA347;
+}
+
+.pokemon {
+  border: solid 1px #FFFFFF;
+  border-radius: 7px;
+  padding: 4px;
+  margin: 3px;
+  height: 70px;
+  width: 80px;
+  overflow: hidden;
+  vertical-align: center;
+}
+
+.pokemon:hover{
+  cursor: hand;
+}
+
+.pokemon.selected {
+  border: solid 1px #FFFFFF;
+  background-color: #56C63D;
+}
+
+.pokemon img {
+  display:block;
+  margin:auto;
+  max-height: 100%;
+  max-width: 100%;
+}
+
+.pokemon.selected img {
+  -webkit-filter: drop-shadow(1px 1px 0 #FFFFFF)
+                  drop-shadow(-1px -1px 0 #FFFFFF);
+  filter: drop-shadow(1px 1px 0 #FFFFFF)
+          drop-shadow(-1px -1px 0 #FFFFFF);
 }

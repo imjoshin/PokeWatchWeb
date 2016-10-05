@@ -10,10 +10,20 @@ session_start();
 function init(){
   //if(true){
   if(isset($_SESSION["user"]) && strlen($_SESSION["user"]) > 0){
+    $stmt = db_op("select * from notifications where address='" . $_SESSION["address"] . "'");
+    $selected = $stmt->fetch_array(MYSQLI_ASSOC);
     $regions = "";
     $stmt = db_op("select * from regions");
+
     while($row = $stmt->fetch_array(MYSQLI_ASSOC)){
-      $regions .= "<li><a class='region' id=" . $row["code"] . " href='region.php#" . $row["code"] . "'>" . $row["name"] . "</a></li>";
+      if($row["code"] == "override") continue;
+
+      $regions .= "<li>
+                    <div>
+                      <input type='checkbox' name='vehicle' data-region = '" . $row["code"] . "' class='regionCheck' " . ($selected[$row["code"]] ? "checked='checked'" : "") . ">
+                      <a class='region' id=" . $row["code"] . " href='region.php#" . $row["code"] . "'>" . $row["name"] . "</a>
+                    </div>
+                  </li>";
     }
 
     return json_encode(array("regions" => $regions));
@@ -104,11 +114,13 @@ function init(){
 function login($username, $pass){
   $username = preg_replace('/[^\w]/', '', $username);
   $pass = preg_replace('/[^\w]/', '', $pass);
-  $stmt = db_op("select * from users where username = '$username' and pass = '$pass'");
+  $stmt = db_op("select address from users where username = '$username' and pass = '$pass'");
   if($stmt->num_rows != 1){
     return json_encode(array("error"=>"Invalid username or password."));
   }
+  $row = $stmt->fetch_array(MYSQLI_ASSOC);
 
+  $_SESSION["address"] = $row["address"];
   $_SESSION["user"] = $username;
   return json_encode(array());
 }
@@ -164,7 +176,77 @@ function signout(){
 }
 
 function loadRegion($region){
+  $stmt = db_op("select name from regions where code = '$region'");
+  if($stmt->num_rows != 1){
+    return json_encode(array("error"=>"Cannot access database."));
+  }
+  $row = $stmt->fetch_array(MYSQLI_ASSOC);
+  $regionName = $row["name"];
+  $html = "<div class='row'><h1>$regionName</h1></div>";
 
+  if($region != "override"){
+    $stmt = db_op("select * from notifications where address='" . $_SESSION["address"] . "'");
+    $row = $stmt->fetch_array(MYSQLI_ASSOC);
+
+    //$html .= "<input type='submit' class='regionButton btn' value='" . ($row[$region] ? "Disable" : "Enable") . "'>";
+    $html .= "<div class='regionWrapper' style='" . ($row[$region] ? "" : "display: none;") . "'>";
+    $html .= "<div class='row'><h3>Notification Times</h3></div>";
+
+    foreach(array("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday") as $day){
+      $code = substr($day, 0, 3);
+      $html .= "<div class='row'>
+                  <table>
+                    <tr>
+                      <td>$day</td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  </table>
+
+
+                </div>";
+    }
+
+
+
+    $html .= "<div class='row'><h3>Pokemon</h3></div>";
+    $stmt = db_op("select * from not_$region where address='" . $_SESSION["address"] . "'");
+    $row = $stmt->fetch_array(MYSQLI_ASSOC);
+
+    $html .= "<div id='pokemon' class='row'>";
+    for($i = 1; $i <= 151; $i++){
+      $html .= "<div class='pokemon col-lg-1 col-md-1 col-sm-1" . ($row["p$i"] ? " selected" : "") . "' data-num='$i' data-region='$region'><img src='assets/img/pokemon/$i.png'></div>";
+    }
+    $html .= "</div>";
+
+    return json_encode(array("html"=>$html));
+  }else{
+    return json_encode(array("html"=>$html));
+  }
+}
+
+function updatePokemon($region, $pokemon, $selected){
+  if($selected == "false") $selected = 1;
+  else $selected = 0;
+
+  $stmt = db_op("update not_$region set p$pokemon = $selected where address='" . $_SESSION["address"] . "'");
+  if(!$stmt){
+    return json_encode(array("error"=>"Unable to update."));
+  }else{
+    return json_encode(array());
+  }
+}
+
+function updateRegion($region, $selected){
+  if($selected == "true") $selected = 1;
+  else $selected = 0;
+
+  $stmt = db_op("update notifications set $region = $selected where address='" . $_SESSION["address"] . "'");
+  if(!$stmt){
+    return json_encode(array("error"=>"Unable to update."));
+  }else{
+    return json_encode(array());
+  }
 }
 
 function db_op($query){
@@ -180,6 +262,12 @@ function getVerificationCode(){
 		$ret .= $characters[rand(0, strlen($characters) - 1)];
 	}
 	return $ret;
+}
+
+function makeTimePicker($defaultTime){
+  return "<div class='input-group date' class='timepicker'>
+            <input type='text' class='form-control' value='$defaultTime'>
+          </div>";
 }
 
 ?>

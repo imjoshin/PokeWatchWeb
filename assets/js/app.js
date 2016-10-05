@@ -83,7 +83,6 @@ $(document).on("ready", function(){
         if(data["error"]){
           alert(data["error"]);
         }else{
-          alert("pass");
           window.location = "http://mtupogo.com";
         }
       },
@@ -104,6 +103,30 @@ $(document).on("ready", function(){
       cache: false,
       success: function(data) {
         window.location = "http://mtupogo.com";
+      }
+    });
+  });
+
+  $(document).on("change", ".regionCheck", function(){
+    $.ajax({
+      type: "POST",
+      dataType: "json",
+      url: "scripts/ajax.php",
+      data: {
+        action: "updateRegion",
+        region: $(this).data("region"),
+        selected: $(this).prop("checked")
+      },
+      cache: false,
+      success: function(data) {
+        if(data["error"]){
+          alert(data["error"]);
+        }else{
+
+        }
+      },
+      error: function(xhr, status, error) {
+        alert("error");
       }
     });
   });
