@@ -108,21 +108,29 @@ $(document).on("ready", function(){
   });
 
   $(document).on("change", ".regionCheck", function(){
+    var selected = $(this).prop("checked");
+    var region = $(this).data("region");
     $.ajax({
       type: "POST",
       dataType: "json",
       url: "scripts/ajax.php",
       data: {
         action: "updateRegion",
-        region: $(this).data("region"),
-        selected: $(this).prop("checked")
+        region: region,
+        selected: selected
       },
       cache: false,
       success: function(data) {
         if(data["error"]){
           alert(data["error"]);
         }else{
-
+          if($(".regionWrapper").length > 0 && $(".regionWrapper").data("region") == region){
+            if(selected){
+              $(".regionWrapper").slideDown(300);
+            }else{
+              $(".regionWrapper").slideUp(300);
+            }
+          }
         }
       },
       error: function(xhr, status, error) {

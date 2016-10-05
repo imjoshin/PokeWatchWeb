@@ -189,7 +189,7 @@ function loadRegion($region){
     $row = $stmt->fetch_array(MYSQLI_ASSOC);
 
     //$html .= "<input type='submit' class='regionButton btn' value='" . ($row[$region] ? "Disable" : "Enable") . "'>";
-    $html .= "<div class='regionWrapper' style='" . ($row[$region] ? "" : "display: none;") . "'>";
+    $html .= "<div class='regionWrapper' data-region='$region' style='" . ($row[$region] ? "" : "display: none;") . "'>";
     $html .= "<div class='row'><h3>Notification Times</h3></div>";
 
     foreach(array("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday") as $day){
