@@ -2,30 +2,28 @@
 include "functions.php";
 $action = $_POST["action"];
 
+if (isset($_SESSION["user"]) && $_SESSION["user"] != "") $user = $_SESSION["user"];
+else $user = "";
+
+if($action == "init"){
+  echo init();
+}
+
 if($action == "login"){
-  if($_POST["pass"] == "0401"){
-    session_start();
-    $_SESSION["user"] = "b";
-    echo init();
-  }else if($_POST["pass"] == "4958"){
-    session_start();
-    $_SESSION["user"] = "j";
-    echo init();
-  }else
-    echo json_encode(array());
+  //echo json_encode(array("error"=>$_POST["username"] . " " . $_POST["password"]));
+  if(isset($_POST["username"]) && isset($_POST["password"]))
+    echo login($_POST["username"], $_POST["password"]);
 }
 
-if($action == "edit"){
-  echo edit($_POST["id"], $_POST["col"], $_POST["val"]);
+if($action == "register"){
+  //echo json_encode(array("error"=>$_POST["username"] . " " . $_POST["password"] . " " . $_POST["cpassword"] . " " . $_POST["address"]));
+  if(isset($_POST["username"]) && isset($_POST["password"]) && isset($_POST["cpassword"]) && isset($_POST["address"]))
+    echo register($_POST["username"], $_POST["password"], $_POST["cpassword"], $_POST["address"]);
 }
 
-if($action == "add"){
-  if($_POST["question"] == "test") echo json_encode(array("return"=>loadTable()));
-  else echo add($_POST["date"], $_POST["asker"], $_POST["question"], $_POST["banswer"], $_POST["janswer"]);
+if($action == "signout"){
+  echo signout();
 }
 
-if($action == "refresh"){
-  echo loadTable();
-}
 
 ?>
