@@ -12,11 +12,15 @@ Dark Gray: #1B1D1E
 html, body {
   height: 100%;
   background-color: #5E6D70;
+  color: #FFFFFF;
 }
 h1, h2, h3, h4, h5 {
   text-align: center;
   font-weight: bold;
   color: #FFFFFF;
+}
+.btn {
+  color: #000000;
 }
 .row {
   margin: 0px;
@@ -207,27 +211,33 @@ h1, h2, h3, h4, h5 {
   width: 80px;
   overflow: hidden;
   vertical-align: center;
+  transition: .1s;
+  display: inline-block;
 }
-
 .pokemon:hover{
   cursor: hand;
 }
-
 .pokemon.selected {
   border: solid 1px #FFFFFF;
   background-color: #56C63D;
 }
-
 .pokemon img {
   display:block;
   margin:auto;
   max-height: 100%;
   max-width: 100%;
 }
-
 .pokemon.selected img {
   -webkit-filter: drop-shadow(1px 1px 0 #FFFFFF)
                   drop-shadow(-1px -1px 0 #FFFFFF);
   filter: drop-shadow(1px 1px 0 #FFFFFF)
           drop-shadow(-1px -1px 0 #FFFFFF);
+}
+
+.timeTable {
+  margin: 0 auto;
+}
+.timeTable input[type="text"] {
+  background-color: transparent;
+  color: #FFFFFF;
 }

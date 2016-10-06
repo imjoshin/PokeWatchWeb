@@ -1,6 +1,7 @@
 <?php
 require_once ('constants.php');
 require_once ('connect.php');
+require ('PHPMailer/PHPMailerAutoload.php');
 ini_set("log_errors", 1);
 ini_set('display_errors', '1');
 error_reporting(E_ALL);
@@ -12,8 +13,14 @@ function init(){
   if(isset($_SESSION["user"]) && strlen($_SESSION["user"]) > 0){
     $stmt = db_op("select * from notifications where address='" . $_SESSION["address"] . "'");
     $selected = $stmt->fetch_array(MYSQLI_ASSOC);
-    $regions = "";
     $stmt = db_op("select * from regions");
+
+
+    $regions = "<li>
+                  <div>
+                    <a class='region' id='override' href='region.php#override'>Overrides</a>
+                  </div>
+                </li>";
 
     while($row = $stmt->fetch_array(MYSQLI_ASSOC)){
       if($row["code"] == "override") continue;
@@ -182,6 +189,7 @@ function loadRegion($region){
   }
   $row = $stmt->fetch_array(MYSQLI_ASSOC);
   $regionName = $row["name"];
+
   $html = "<div class='row'><h1>$regionName</h1></div>";
 
   if($region != "override"){
@@ -190,39 +198,35 @@ function loadRegion($region){
 
     //$html .= "<input type='submit' class='regionButton btn' value='" . ($row[$region] ? "Disable" : "Enable") . "'>";
     $html .= "<div class='regionWrapper' data-region='$region' style='" . ($row[$region] ? "" : "display: none;") . "'>";
-    $html .= "<div class='row'><h3>Notification Times</h3></div>";
+    $html .= "<div class='row'><h3>Notification Times</h3>(not functional yet)</div>";
 
+    $html .= "<div class='row text-center'><table class='timeTable'>";
     foreach(array("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday") as $day){
       $code = substr($day, 0, 3);
-      $html .= "<div class='row'>
-                  <table>
-                    <tr>
-                      <td>$day</td>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                  </table>
-
-
-                </div>";
+        $html .= "<tr>
+                    <td>$day</td>
+                    <td>" . makeTimePicker($region, $code, "Start", $row["$region$code" . "Start"]) . "</td>
+                    <td>" . makeTimePicker($region, $code, "End", $row["$region$code" . "End"]) . "</td>
+                  </tr>";
     }
-
-
-
-    $html .= "<div class='row'><h3>Pokemon</h3></div>";
-    $stmt = db_op("select * from not_$region where address='" . $_SESSION["address"] . "'");
-    $row = $stmt->fetch_array(MYSQLI_ASSOC);
-
-    $html .= "<div id='pokemon' class='row'>";
-    for($i = 1; $i <= 151; $i++){
-      $html .= "<div class='pokemon col-lg-1 col-md-1 col-sm-1" . ($row["p$i"] ? " selected" : "") . "' data-num='$i' data-region='$region'><img src='assets/img/pokemon/$i.png'></div>";
-    }
-    $html .= "</div>";
-
-    return json_encode(array("html"=>$html));
+      $html .= "</table><br/><input type='submit' class='timeSubmit btn' value='Submit Times'></div>";
   }else{
-    return json_encode(array("html"=>$html));
+    $html = "<div class='row'><h4>These will override all other settings.</h4></div>";
   }
+
+
+  $html .= "<br/><div class='row'><h3>Pokemon</h3></div>";
+  $stmt = db_op("select * from not_$region where address='" . $_SESSION["address"] . "'");
+  $row = $stmt->fetch_array(MYSQLI_ASSOC);
+
+  $html .= "<div id='pokemon' class='row'>";
+  for($i = 1; $i <= 151; $i++){
+    $html .= "<div class='pokemon col-lg-1 col-md-1 col-sm-1" . ($row["p$i"] ? " selected" : "") . "' data-num='$i' data-region='$region'><img src='assets/img/pokemon/$i.png'></div>";
+  }
+  $html .= "</div>";
+
+    return json_encode(array("html"=>$html));
+
 }
 
 function updatePokemon($region, $pokemon, $selected){
@@ -264,10 +268,51 @@ function getVerificationCode(){
 	return $ret;
 }
 
-function makeTimePicker($defaultTime){
+function makeTimePicker($region, $day, $time, $defaultTime){
   return "<div class='input-group date' class='timepicker'>
-            <input type='text' class='form-control' value='$defaultTime'>
+            <input type='text' class='form-control' data-region='$region' data-day='$day' data-time='$time' value='$defaultTime'>
           </div>";
+}
+
+function sendMessage($to, $msg){
+  $recipients = explode(",", $to);
+
+  $from = EMAIL;
+  $pass = EMAILPASS;
+
+  $mail = new PHPMailer();
+  $mail->isSMTP();
+  $mail->SMTPDebug = 2; //2 for both client and server side response
+  $mail->Debugoutput = 'html';
+  $mail->Host = 'smtp.gmail.com';
+  $mail->Port = 587;
+  $mail->SMTPSecure = 'tls';
+  $mail->SMTPAuth = true;
+  $mail->Username = "$from";//sender's gmail address
+  $mail->Password = "$pass";//sender's password
+  $mail->setFrom("$from", 'MTUPoGo Alert');//sender's incormation
+  //$mail->addReplyTo('myanotheremail@gmail.com', 'Barack Obama');//if alternative reply to address is being used
+
+  foreach($recipients as $email)
+  {
+    if($email == '') continue;
+    $mail->AddCC($email, '');
+  }
+
+  $mail->Subject = '';//subject of the email
+  $mail->msgHTML("$msg");
+  $mail->AltBody = '';
+  //$mail->addAttachment('images/logo.png');//some attachment
+
+  file_put_contents("sms.log", "To: $to - $msg", FILE_APPEND);
+
+  if (!$mail->send()) {
+  	file_put_contents("sms.log", " - FAILED\r\n", FILE_APPEND);
+      return false; //not sent
+  } else {
+  	file_put_contents("sms.log", " - SUCCESS\r\n", FILE_APPEND);
+      return true; //sent
+  }
 }
 
 ?>

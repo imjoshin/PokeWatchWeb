@@ -38,7 +38,7 @@ $(document).on("ready", function(){
           alert(data["error"]);
         }else{
           $("#content").html(data["html"]);
-          
+
         }
       },
       error: function(xhr, status, error) {
@@ -73,4 +73,31 @@ $(document).on("click", ".pokemon", function(){
       alert("error");
     }
   });
+/*
+  $(document).on("click", ".timeSubmit", function(){
+    var pokemon = $(this);
+
+    $.ajax({
+      type: "POST",
+      dataType: "json",
+      url: "scripts/ajax.php",
+      data: {
+        action: "updateTimes",
+        region: $(this).data("region"),
+        pokemon: $(this).data("num"),
+        selected: $(this).hasClass("selected")
+      },
+      cache: false,
+      success: function(data) {
+        if(data["error"]){
+          alert(data["error"]);
+        }else{
+          pokemon.toggleClass("selected");
+        }
+      },
+      error: function(xhr, status, error) {
+        alert("error");
+      }
+    });
+  */
 });
