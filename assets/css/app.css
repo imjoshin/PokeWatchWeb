@@ -201,7 +201,9 @@ h1, h2, h3, h4, h5 {
 	background-color: #1CA347;
 	border-color: #1CA347;
 }
-
+#pokemon {
+  text-align: center;
+}
 .pokemon {
   border: solid 1px #FFFFFF;
   border-radius: 7px;

@@ -13,6 +13,7 @@ $(document).on("ready", function(){
       if(data["login"]){
         $(".side-nav").hide();
         $(".navbar-toggle").hide();
+        $(".row").css("padding-left", "0px");
         $("#content").html(data["login"]);
       }else{
         $("#regions").html(data["regions"]);

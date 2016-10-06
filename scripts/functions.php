@@ -284,7 +284,7 @@ function sendMessage($to, $msg){
   $mail->isSMTP();
   $mail->SMTPDebug = 2; //2 for both client and server side response
   $mail->Debugoutput = 'html';
-  $mail->Host = 'smtp.gmail.com';
+  $mail->Host = gethostbyname('smtp.gmail.com');
   $mail->Port = 587;
   $mail->SMTPSecure = 'tls';
   $mail->SMTPAuth = true;
