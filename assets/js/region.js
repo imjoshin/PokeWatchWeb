@@ -39,6 +39,12 @@ $(document).on("ready", function(){
         }else{
           $("#content").html(data["html"]);
 
+          $(".pokemon").each(function(){
+            var height = $(this).find("img").height();
+            if(height != 60)
+              $(this).css("padding-top", ((70 - height) / 2) + "px");
+          });
+
         }
       },
       error: function(xhr, status, error) {

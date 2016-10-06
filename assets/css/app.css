@@ -201,6 +201,7 @@ h1, h2, h3, h4, h5 {
 	background-color: #1CA347;
 	border-color: #1CA347;
 }
+
 #pokemon {
   text-align: center;
 }
@@ -210,7 +211,7 @@ h1, h2, h3, h4, h5 {
   padding: 4px;
   margin: 3px;
   height: 70px;
-  width: 80px;
+  width: 70px;
   overflow: hidden;
   vertical-align: center;
   transition: .1s;
